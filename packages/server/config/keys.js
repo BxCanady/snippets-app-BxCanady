@@ -14,7 +14,7 @@ module.exports = {
 
     url:
       process.env.MONGODB_URI ||
-      `mongodb+srv://<username>:<password>@cluster0.<cluster_key>.mongodb.net/snippets?retryWrites=true`, // DID YOU DELETE THE &w=majority
+      `mongodb+srv://brandoncanady:Zaniya1390@cluster0.hm6w4lj.mongodb.net/snippets?retryWrites=true`, // DID YOU DELETE THE &w=majority
     /**
      * IF YOUR DATABASE DOES NOT SEED BECAUSE YOU LEFT &w=majority YOU WILL BE PUBLICLY SHAMED
      *
