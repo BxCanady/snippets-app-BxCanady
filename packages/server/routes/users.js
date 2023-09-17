@@ -7,9 +7,25 @@ const router = express.Router();
 
 router
   .route("/:username")
-  /**
-   * Your GET route here
-   */
+  .get(async (req, res) => {
+    const { username } = req.params;
+
+    try {
+      const user = await User.findOne({ username })
+        .populate({
+          path: "posts", // Populate the user's posts
+          populate: { path: "author", select: ["username", "profile_image"] },
+        });
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json(user.toJSON());
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  })
   .put(async (req, res) => {
     const { password } = req.body;
     const { username } = req.params;
@@ -40,13 +56,13 @@ router.route("/:username/avatar").put(requireAuth, async (req, res) => {
   const { profile_image } = req.body;
 
   if (!req.user.username.toLowerCase() === username.toLowerCase()) {
-    return res.status(401).json({ error: "unauthorized" });
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   const user = await User.findOne({ username });
 
   if (!user) {
-    return res.status(404).json({ error: "user not found" });
+    return res.status(404).json({ error: "User not found" });
   }
 
   user.profile_image = profile_image;

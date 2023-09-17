@@ -1,6 +1,6 @@
 import React from "react";
 import { Navbar, Nav, Button, Figure, Container } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; // Import Link
 import { useProvideAuth } from "../hooks/useAuth";
 
 export default function Header() {
@@ -12,6 +12,7 @@ export default function Header() {
   if (!user) {
     return null;
   }
+
   return (
     <Navbar bg="header" expand="lg">
       <Container>
@@ -23,8 +24,8 @@ export default function Header() {
           {user && (
             <Nav className="d-flex align-items-center">
               <Nav.Item
-                as={Link}
-                to={`/u/${user.username}`}
+                as={Link} // Use Link component here
+                to={`/u/${user.username}`} // Link to the user's profile
                 className="d-flex align-items-center"
               >
                 <Figure
