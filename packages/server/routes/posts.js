@@ -59,11 +59,32 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", requireAuth, async (req, res, next) => {
-  /**
-   * Your Code Here
-   */
-  res.status(404).json("Placeholder response");
+  const postId = req.params.id;
+  const { user } = req;
+
+  try {
+    // Use findByIdAndDelete to delete the post by its ID
+    const deletedPost = await Post.findByIdAndDelete(postId);
+
+    if (!deletedPost) {
+      // If the post does not exist, return a 404 status
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Remove the deleted post ID from the user's posts array
+    user.posts = user.posts.filter((postId) => postId.toString() !== deletedPost._id.toString());
+
+    await user.save();
+
+    // If the deletion was successful, return a 200 status
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    // If there's any error during the database query, return a 404 status
+    res.status(404).json({ error: "Post not found" });
+  }
 });
+
 
 router.all("/like/:postId", requireAuth, async (req, res) => {
   const { postId } = req.params;
