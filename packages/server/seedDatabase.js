@@ -7,34 +7,19 @@ import exec from "await-exec";
 
 async function seedDatabase() {
   try {
-    const users = await User.find({});
-    const posts = await Post.find({});
+    console.log(chalk.yellow("Checking and populating database..."));
 
-    if (users.length > 0 && posts.length > 0) {
-      console.log(
-        chalk.yellow("Database already initiated, skipping populating script")
-      );
-      return;
-    }
-    if (users.length === 0) {
-      console.log(
-        chalk.yellow("No users in the database, creating sample data...")
-      );
-      await exec(
-        `mongoimport --collection=users --db=snippets --file=./db/users.json ${keys.database.url}`
-      );
-    }
+    console.log(chalk.yellow("Creating sample users..."));
+    await exec(
+      `mongoimport --collection=users --db=snippets --file=./db/users.json ${keys.database.url}`
+    );
 
-    if (posts.length === 0) {
-      console.log(
-        chalk.yellow("No posts in the database, creating sample data...")
-      );
-      await exec(
-        `mongoimport --collection=posts --db=snippets --file=./db/posts.json ${keys.database.url}`
-      );
+    console.log(chalk.yellow("Creating sample posts..."));
+    await exec(
+      `mongoimport --collection=posts --db=snippets --file=./db/posts.json ${keys.database.url}`
+    );
 
-      console.log(chalk.green(`Successfully populated database!!`));
-    }
+    console.log(chalk.green("Successfully populated database!!"));
   } catch (error) {
     console.log(chalk.red(error));
   }

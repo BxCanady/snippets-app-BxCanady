@@ -27,7 +27,7 @@ router
     }
   })
   .put(async (req, res) => {
-    const { password } = req.body;
+    const { password, email } = req.body;
     const { username } = req.params;
 
     const hashedpassword = await bcrypt.hash(password, 12);
@@ -39,6 +39,7 @@ router
         },
         {
           passwordHash: hashedpassword,
+          email, // Add email to the user update
         },
         {
           new: true,
@@ -56,13 +57,13 @@ router.route("/:username/avatar").put(requireAuth, async (req, res) => {
   const { profile_image } = req.body;
 
   if (!req.user.username.toLowerCase() === username.toLowerCase()) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(401).json({ error: "unauthorized" });
   }
 
   const user = await User.findOne({ username });
 
   if (!user) {
-    return res.status(404).json({ error: "User not found" });
+    return res.status(404).json({ error: "user not found" });
   }
 
   user.profile_image = profile_image;

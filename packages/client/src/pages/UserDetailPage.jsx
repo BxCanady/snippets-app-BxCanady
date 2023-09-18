@@ -48,7 +48,6 @@ const UserDetailPage = () => {
     event.preventDefault();
     event.stopPropagation();
     const form = event.currentTarget;
-    // handle invalid or empty form
     if (form.checkValidity() === false) {
       setValidated(true);
       return;
@@ -59,13 +58,13 @@ const UserDetailPage = () => {
       errorMessage: null,
     });
     try {
-      // write code to call edit user endpoint 'users/:id'
+      // Call edit user endpoint here and handle the update
       const {
         user: { uid, username },
       } = state;
       console.log(data.password, uid, username);
       setValidated(false);
-      // don't forget to update loading state and alert success
+      // Update the loading state and display a success message if needed
     } catch (error) {
       setData({
         ...data,
@@ -117,48 +116,50 @@ const UserDetailPage = () => {
                 Edit Password
               </div>
             )}
-            {open && (
-              <Container animation="false">
-                <div className="row justify-content-center p-4">
-                  <div className="col text-center">
-                    <Form
-                      noValidate
-                      validated={validated}
-                      onSubmit={handleUpdatePassword}
-                    >
-                      <Form.Group>
-                        <Form.Label htmlFor="password">New Password</Form.Label>
-                        <Form.Control
-                          type="password"
-                          name="password"
-                          required
-                          value={data.password}
-                          onChange={handleInputChange}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          New Password is required
-                        </Form.Control.Feedback>
-                        <Form.Text id="passwordHelpBlock" muted>
-                          Must be 8-20 characters long.
-                        </Form.Text>
-                      </Form.Group>
-
-                      {data.errorMessage && (
-                        <span className="form-error">{data.errorMessage}</span>
-                      )}
-                      <Button type="submit" disabled={data.isSubmitting}>
-                        {data.isSubmitting ? <LoadingSpinner /> : "Update"}
-                      </Button>
-                    </Form>
-                  </div>
-                </div>
-              </Container>
-            )}
+            {/* Display the email here */}
+            <div className="user-email">{user.email}</div>
           </Card.Body>
         </Card>
       </Container>
+      {open && (
+        <Container animation="false">
+          <div className="row justify-content-center p-4">
+            <div className="col text-center">
+              <Form
+                noValidate
+                validated={validated}
+                onSubmit={handleUpdatePassword}
+              >
+                <Form.Group>
+                  <Form.Label htmlFor="password">New Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="password"
+                    required
+                    value={data.password}
+                    onChange={handleInputChange}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    New Password is required
+                  </Form.Control.Feedback>
+                  <Form.Text id="passwordHelpBlock" muted>
+                    Must be 8-20 characters long.
+                  </Form.Text>
+                </Form.Group>
+
+                {data.errorMessage && (
+                  <span className="form-error">{data.errorMessage}</span>
+                )}
+                <Button type="submit" disabled={data.isSubmitting}>
+                  {data.isSubmitting ? <LoadingSpinner /> : "Update"}
+                </Button>
+              </Form>
+            </div>
+          </div>
+        </Container>
+      )}
       <Container className="pt-3 pb-3">
-        {user.posts.length !== 0 ? (
+        {user && user.posts && user.posts.length !== 0 ? (
           user.posts.map((post) => (
             <Post key={post._id} post={post} userDetail />
           ))

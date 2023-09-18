@@ -19,10 +19,12 @@ mongoose.connect(keys.database.url, {
   useCreateIndex: true,
 })
 
-mongoose.connection.on('connected', () => {
-  console.log('connected to mongoDB')
-  seedDatabase()
-})
+mongoose.connection.on('connected', async () => {
+  console.log('Connected to MongoDB');
+
+  // Call the seedDatabase function when the MongoDB connection is established
+  await seedDatabase();
+});
 
 mongoose.connection.on('error', (err) => {
   console.log('err connecting', err)

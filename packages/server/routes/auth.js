@@ -1,50 +1,47 @@
-import express from 'express'
-import bcrypt from 'bcryptjs'
-import { User } from '../models'
-import keys from '../config/keys'
-import jwt from 'jsonwebtoken'
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import { User } from '../models';
+import keys from '../config/keys';
+import jwt from 'jsonwebtoken';
 
-const router = express.Router()
+const router = express.Router();
 
-router.route('/').get((req, res, next) => {
-  res.send('auth endpoint')
-})
+router.get('/', (req, res) => {
+  res.send('auth endpoint');
+});
 
 router.post('/signup', async (req, res) => {
-  const { username, password, profile_image } = req.body
+  const { username, email, password, profile_image } = req.body;
 
-  if (!password || !username) {
-    return res.status(422).json({ error: 'please add all the fields' })
+  if (!username || !email || !password) {
+    return res.status(422).json({ error: 'Please provide username, email, and password.' });
   }
 
-  User.findOne({ username: username })
-    .then((savedUser) => {
-      if (savedUser) {
-        return res
-          .status(422)
-          .json({ error: 'user already exists with that name' })
-      }
-      bcrypt.hash(password, 12).then((hashedpassword) => {
-        const user = new User({
-          username,
-          passwordHash: hashedpassword,
-          profile_image: profile_image,
-        })
+  try {
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
 
-        user
-          .save()
-          .then((user) => {
-            res.json({ message: 'saved successfully' })
-          })
-          .catch((err) => {
-            console.log(err)
-          })
-      })
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-})
+    if (existingUser) {
+      return res.status(422).json({ error: 'User with the same username or email already exists.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const user = new User({
+      username,
+      email, // Include email
+      passwordHash: hashedPassword,
+      profile_image,
+    });
+
+    await user.save();
+
+    res.json({ message: 'User registered successfully.' });
+  } catch (error) {
+    console.error('Error during user registration:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 
 router.post('/signin', async (req, res) => {
   const { username, password } = req.body
