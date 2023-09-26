@@ -23,6 +23,7 @@ router
 
       res.json(user.toJSON());
     } catch (error) {
+      console.error(error); // Log the error for debugging
       res.status(500).json({ error: "Internal server error" });
     }
   })
@@ -33,22 +34,21 @@ router
     const hashedpassword = await bcrypt.hash(password, 12);
 
     try {
-      const userUpdate = await User.findOneAndUpdate(
-        {
-          username,
-        },
-        {
-          passwordHash: hashedpassword,
-          email, // Add email to the user update
-        },
-        {
-          new: true,
-        }
-      );
+      const user = await User.findOne({ username });
 
-      res.json(userUpdate.toJSON());
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Update user's password and email
+      user.passwordHash = hashedpassword;
+      user.email = email;
+      await user.save();
+
+      res.json(user.toJSON());
     } catch (error) {
-      res.status(404).end();
+      console.error(error); // Log the error for debugging
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
@@ -57,18 +57,53 @@ router.route("/:username/avatar").put(requireAuth, async (req, res) => {
   const { profile_image } = req.body;
 
   if (!req.user.username.toLowerCase() === username.toLowerCase()) {
-    return res.status(401).json({ error: "unauthorized" });
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const user = await User.findOne({ username });
+  try {
+    const user = await User.findOne({ username });
 
-  if (!user) {
-    return res.status(404).json({ error: "user not found" });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Update user's profile image
+    user.profile_image = profile_image;
+    await user.save();
+
+    res.json(user.toJSON());
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Add a PUT route to update a user's avatar
+router.route("/:username/avatar").put(requireAuth, async (req, res) => {
+  const { username } = req.params;
+  const { profile_image } = req.body;
+
+  // Check if the authenticated user is updating their own avatar
+  if (req.user.username.toLowerCase() !== username.toLowerCase()) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
-  user.profile_image = profile_image;
-  await user.save();
-  res.json(user.toJSON());
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Update the user's profile image
+    user.profile_image = profile_image;
+    await user.save();
+
+    res.json(user.toJSON());
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 module.exports = router;

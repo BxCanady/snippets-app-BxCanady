@@ -1,0 +1,45 @@
+/* Define styles for the search bar */
+.search-bar {
+    background-color: #183054;
+    /* Background color */
+    padding: 10px;
+    /* Adjust padding as needed */
+}
+
+.search-bar input[type="text"] {
+    background-color: transparent;
+    /* Make the input background transparent */
+    border: none;
+    /* Remove input border */
+    color: white;
+    /* Text color */
+    width: 100%;
+    /* Full width */
+    padding: 5px 10px;
+    /* Adjust padding as needed */
+    border-radius: 4px;
+    /* Add border radius */
+}
+
+.search-bar input[type="text"]::placeholder {
+    color: white;
+    /* Placeholder text color */
+}
+
+/* Style the search button (optional) */
+.search-bar button {
+    background-color: #007bff;
+    /* Button background color */
+    color: white;
+    /* Button text color */
+    border: none;
+    /* Remove button border */
+    padding: 5px 10px;
+    /* Adjust padding as needed */
+    cursor: pointer;
+    /* Add pointer cursor on hover */
+    border-radius: 4px;
+    /* Add border radius */
+    margin-left: 10px;
+    /* Add margin to separate it from the input */
+}

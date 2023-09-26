@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import api from "../../utils/api.utils.js";
-import { Post, LoadingSpinner } from "../";
+import { Post, LoadingSpinner, SearchBar } from "../";
 import { useProvideAuth } from "../../hooks/useAuth";
 
 const initialState = {
@@ -18,6 +18,7 @@ const Feed = () => {
   const [posts, setPosts] = useState(null);
   const [postLoading, setPostLoading] = useState(true);
   const [postError, setPostError] = useState(false);
+  const [searchKeywords, setSearchKeywords] = useState("");
 
   const [data, setData] = useState(initialState);
   const [validated, setValidated] = useState(false);
@@ -75,10 +76,11 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    const getPosts = async () => {
+    const fetchData = async () => {
       try {
-        const allPosts = await api.get("/posts");
-        setPosts(allPosts.data);
+        // Fetch posts
+        const postsResponse = await api.get("/posts");
+        setPosts(postsResponse.data);
         setPostLoading(false);
       } catch (err) {
         console.error(err.message);
@@ -86,8 +88,16 @@ const Feed = () => {
         setPostError(true);
       }
     };
-    getPosts();
+
+    fetchData();
   }, []);
+
+  // Filter posts based on search keywords
+  const filteredPosts = posts
+    ? posts.filter((post) =>
+      post.text.toLowerCase().includes(searchKeywords.toLowerCase())
+    )
+    : [];
 
   return (
     <>
@@ -119,12 +129,21 @@ const Feed = () => {
           </Button>
         </Form>
       </Container>
+      <SearchBar setKeywords={setSearchKeywords} />
 
       {!postLoading ? (
         <Container className="pt-3 pb-3">
-          <h6>Recent Snips</h6>
-          {postError && "Error fetching posts"}
-          {posts && posts.map((post) => <Post key={post._id} post={post} />)}
+          <h6>Search Results</h6>
+          {postError && "Error fetching data"}
+
+          {filteredPosts.length > 0 && (
+            <>
+              <h6>Posts</h6>
+              {filteredPosts.map((post) => (
+                <Post key={post._id} post={post} />
+              ))}
+            </>
+          )}
         </Container>
       ) : (
         <LoadingSpinner full />

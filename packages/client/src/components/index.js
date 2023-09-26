@@ -10,3 +10,5 @@ export { default as ReplyIcon } from "./icons/ReplyIcon";
 export { default as TrashIcon } from "./icons/TrashIcon";
 export { default as Comment } from "./Comment/Comment";
 export { default as DeleteModal } from "./DeleteModal/DeleteModal";
+export { default as SearchBar } from "./SearchBar/SearchBar";
+export { default as AvatarPicker } from "./AvatarPicker/AvatarPicker";

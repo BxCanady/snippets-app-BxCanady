@@ -35,26 +35,25 @@ const App = () => {
               <Col xs={0} md={2} xl={3} />
               <Col xs={12} md={8} xl={6}>
                 <Routes>
-                  <Route exact path="/u/:uname" element={<UserDetailPage />} />
-                  <Route exact path="/p/:pid" element={<PostDetailPage />} />
-                  <Route exact path="/" element={<Feed />} />
-                  <Route exact path="/login" element={<Navigate to="/" />} />
-                  <Route exact path="/register" element={<Navigate to="/" />} />
+                  <Route path="/u/:uname" element={<UserDetailPage />} />
+                  <Route path="/p/:pid" element={<PostDetailPage />} />
+                  <Route path="/" element={<Feed />} />
+                  <Route path="/login" element={<Navigate to="/" />} />
+                  <Route path="/register" element={<Navigate to="/" />} />
                   <Route
-                    element={({ location }) => {
-                      return (
-                        <div
-                          style={{
-                            padding: "50px",
-                            width: "100%",
-                            textAlign: "center",
-                          }}
-                        >
-                          The page <code>{location.pathname}</code> could not be
-                          found.
-                        </div>
-                      );
-                    }}
+                    path="*"
+                    element={
+                      <div
+                        style={{
+                          padding: "50px",
+                          width: "100%",
+                          textAlign: "center",
+                        }}
+                      >
+                        The page <code>{location.pathname}</code> could not be
+                        found.
+                      </div>
+                    }
                   />
                 </Routes>
               </Col>

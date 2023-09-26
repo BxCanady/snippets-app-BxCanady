@@ -3,13 +3,23 @@ import { Container, Row, Col, InputGroup, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "./RegisterPage.scss";
 import { useProvideAuth } from "../../hooks/useAuth";
-import { LandingHeader, LoadingSpinner } from "../../components";
+import { LandingHeader, LoadingSpinner, AvatarPicker } from "../../components";
 import { setAuthToken } from "../../utils/api.utils";
+
+const profileImages = [
+  "/ww1.png",
+  "/bk3.png",
+  "/bm1.png",
+  "/boy1.png",
+  "/ww5.png"
+
+];
 
 const initialState = {
   username: "",
   email: "",
   password: "",
+  selectedAvatar: profileImages[0], // Initialize with the first image
   isSubmitting: false,
   errorMessage: null,
 };
@@ -20,23 +30,9 @@ const RegisterPage = () => {
 
   let navigate = useNavigate();
 
-  const [profileImage, setProfileImage] = useState(getRandomProfileUrl());
 
-  function getRandomProfileUrl() {
-    //geneartes random pic in img
-    let imgs = [
-      "bird.svg",
-      "dog.svg",
-      "fox.svg",
-      "frog.svg",
-      "lion.svg",
-      "owl.svg",
-      "tiger.svg",
-      "whale.svg",
-    ];
-    let img = imgs[Math.floor(Math.random() * imgs.length)];
-    return `/${img}`;
-  }
+
+
 
   const handleInputChange = (event) => {
     setData({
@@ -44,6 +40,15 @@ const RegisterPage = () => {
       [event.target.name]: event.target.value,
     });
   };
+
+  const handleAvatarSelect = (avatar) => {
+    // Handle the avatar selection from AvatarPicker
+    setData({
+      ...data,
+      selectedAvatar: avatar,
+    });
+  };
+
 
   const handleSignup = async (event) => {
     const form = event.currentTarget;
@@ -63,7 +68,7 @@ const RegisterPage = () => {
         data.username,
         data.email,
         data.password,
-        profileImage
+        data.selectedAvatar // Use the selected avatar from the state
       );
       setData({
         ...data,
@@ -135,6 +140,12 @@ const RegisterPage = () => {
                 {data.errorMessage}
               </span>
             )}
+            <AvatarPicker
+              avatars={profileImages}
+              selectedAvatar={data.selectedAvatar}
+              onSelect={handleAvatarSelect}
+              className="custom-avatar-picker" // Add this line
+            />
             <Row className="mr-0">
               <Col>
                 Already Registered?

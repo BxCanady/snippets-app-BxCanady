@@ -1,0 +1,43 @@
+/* AvatarPicker.scss */
+
+.avatar-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 21px;
+    /* Adjust the gap between avatars */
+}
+
+.avatar-option {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    /* Add rounded corners */
+    transition: border-color 0.2s ease-in-out, transform 0.2s ease;
+    /* Combine transitions */
+}
+
+.avatar-option.selected {
+    border-color: #007bff;
+    /* Change border color when selected */
+}
+
+.figure-img {
+    z-index: 0;
+    border-radius: 50%;
+    /* Make the image round */
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    /* Maintain aspect ratio while filling the container */
+}
+
+.avatar-option:hover {
+    transform: scale(3.5);
+    z-index: 2;
+    /* Scale up the image on hover */
+}
+
+.custom-image-label {
+    text-align: center;
+    margin-top: 10px;
+}
