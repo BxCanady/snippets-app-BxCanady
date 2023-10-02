@@ -1,7 +1,14 @@
 import express from "express";
 const router = express.Router();
-import { Post } from "../models";
+import { Post, Like } from "../models";
 import { requireAuth } from "../middleware";
+
+// Define a new populate query for the 'likes' field
+const likesPopulateQuery = {
+  path: "likes",
+  model: "User",
+  select: "likes",
+};
 
 router.get("/", async (req, res) => {
   const populateQuery = [
@@ -10,6 +17,7 @@ router.get("/", async (req, res) => {
       path: "comments",
       populate: { path: "author", select: ["username", "profile_image"] },
     },
+    likesPopulateQuery, // Add the likes populate query
   ];
   const posts = await Post.find({})
     .sort({ created: -1 })
@@ -47,6 +55,7 @@ router.get("/:id", async (req, res) => {
       path: "comments",
       populate: { path: "author", select: ["username", "profile_image"] },
     },
+    likesPopulateQuery, // Add the likes populate query
   ];
   const post = await Post.findById(req.params.id)
     .populate(populateQuery)
@@ -85,31 +94,28 @@ router.delete("/:id", requireAuth, async (req, res, next) => {
   }
 });
 
-
+// Like a post
 router.all("/like/:postId", requireAuth, async (req, res) => {
   const { postId } = req.params;
   const { user } = req;
-  const post = await Post.findOne({ _id: postId });
 
-  if (!post) {
-    return res.status(422).json({ error: "Cannot find post" });
-  }
   try {
-    if (post.likes.includes(user.id)) {
-      const result = await post.updateOne({
-        $pull: { likes: user.id },
-      });
+    // Check if the user has already liked the post
+    const existingLike = await Like.findOne({ user: user._id, post: postId });
 
-      res.json(result);
+    if (!existingLike) {
+      // If the user hasn't liked the post yet, create a new like
+      const newLike = new Like({ user: user._id, post: postId });
+      await newLike.save();
+      return res.status(200).json({ message: 'Post liked successfully' });
     } else {
-      const result = await post.updateOne({
-        $push: { likes: user.id },
-      });
-
-      res.json(result);
+      // If the user has already liked the post, remove their like
+      await Like.findByIdAndDelete(existingLike._id);
+      return res.status(200).json({ message: 'Post unliked successfully' });
     }
-  } catch (err) {
-    return res.status(422).json({ error: err });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 

@@ -12,7 +12,6 @@ const profileImages = [
   "/bm1.png",
   "/boy1.png",
   "/ww5.png"
-
 ];
 
 const UserDetailPage = () => {
@@ -29,26 +28,30 @@ const UserDetailPage = () => {
 
   const [selectedAvatar, setSelectedAvatar] = useState(user.profile_image);
   const [avatarUpdating, setAvatarUpdating] = useState(false);
-
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
 
   let navigate = useNavigate();
   let params = useParams();
   const {
     state: { isAuthenticated },
   } = useRequireAuth();
-  //............................................
+
   useEffect(() => {
     const getUser = async () => {
       try {
         const userResponse = await api.get(`/users/${params.uname}`);
         setUser(userResponse.data);
         setLoading(false);
+
+        // Check if the displayed user is the logged-in user
+        setIsCurrentUser(userResponse.data.username === state.user.username);
       } catch (err) {
         console.error(err.message);
       }
     };
+    // function is called to fetch user data only when the user is authenticated
     isAuthenticated && getUser();
-  }, [params.uname, isAuthenticated]);
+  }, [params.uname, isAuthenticated, state.user.username]);
 
   const handleInputChange = (event) => {
     setData({
@@ -56,8 +59,7 @@ const UserDetailPage = () => {
       [event.target.name]: event.target.value,
     });
   };
-  //...............................................
-  //function to handle avatar selection
+
   const handleAvatarSelect = (avatar) => {
     setSelectedAvatar(avatar);
   };
@@ -65,30 +67,23 @@ const UserDetailPage = () => {
   const handleAvatarUpdate = async () => {
     setAvatarUpdating(true);
     try {
-
       const endpoint = `/users/${user.username}/avatar`;
 
-      // Send a PUT request to update the user's avatar
       const response = await api.put(endpoint, {
         profile_image: selectedAvatar,
       });
 
       if (response.status === 200) {
-        // Handle success, update user's avatar in the state or any other actions
         console.log("Avatar updated successfully");
       } else {
-        // Handle other response statuses or errors
         console.error("Avatar update failed");
       }
     } catch (error) {
-      // Handle errors, such as displaying an error message
       console.error("Error updating avatar:", error.message);
     } finally {
       setAvatarUpdating(false);
     }
   };
-
-  //.....................................................
 
   const handleUpdatePassword = async (event) => {
     event.preventDefault();
@@ -110,7 +105,6 @@ const UserDetailPage = () => {
       } = state;
       console.log(data.password, uid, username);
       setValidated(false);
-      // Update the loading state and display a success message if needed
     } catch (error) {
       setData({
         ...data,
@@ -154,7 +148,7 @@ const UserDetailPage = () => {
               <Figure.Image src={selectedAvatar} className="w-100 h-100" />
             </Figure>
             <Card.Title>{params.uname}</Card.Title>
-            {state.user.username === params.uname && (
+            {isCurrentUser && (
               <div
                 onClick={() => setOpen(!open)}
                 style={{ cursor: "pointer", color: "#BFBFBF" }}
@@ -162,16 +156,15 @@ const UserDetailPage = () => {
                 Edit Password
               </div>
             )}
-            {/* Display the email here */}
             {isAuthenticated && <div className="user-email">{user.email}</div>}
-            {isAuthenticated && (
+            {isAuthenticated && isCurrentUser && (
               <AvatarPicker
                 avatars={profileImages}
                 selectedAvatar={selectedAvatar}
                 onSelect={handleAvatarSelect}
               />
             )}
-            {isAuthenticated && (
+            {isAuthenticated && isCurrentUser && (
               <Button
                 variant="primary"
                 onClick={handleAvatarUpdate}

@@ -16,6 +16,12 @@ const commentSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    likes: [
+      {
+        type: ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -38,7 +44,7 @@ const postSchema = new mongoose.Schema(
     likes: [
       {
         type: ObjectId,
-        ref: "User",
+        ref: "User", // Replace with the actual name of your User model
       },
     ],
     comments: [commentSchema], // Use the comment schema for comments
