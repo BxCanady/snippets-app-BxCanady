@@ -5,6 +5,7 @@ import { LoadingSpinner, Post, AvatarPicker } from "../components";
 import { useProvideAuth } from "../hooks/useAuth";
 import { useRequireAuth } from "../hooks/useRequireAuth";
 import api from "../utils/api.utils.js";
+import { toast } from "react-toastify"; // Import toast for displaying notifications
 
 const profileImages = [
   "/ww1.png",
@@ -21,7 +22,9 @@ const UserDetailPage = () => {
   const [validated, setValidated] = useState(false);
   const [open, setOpen] = useState(false);
   const [data, setData] = useState({
+    currentPassword: "", // New field for current password
     password: "",
+    confirmPassword: "", // New field for password confirmation
     isSubmitting: false,
     errorMessage: null,
   });
@@ -89,7 +92,7 @@ const UserDetailPage = () => {
     event.preventDefault();
     event.stopPropagation();
     const form = event.currentTarget;
-    if (form.checkValidity() === false) {
+    if (form.checkValidity() === false || data.password !== data.confirmPassword) {
       setValidated(true);
       return;
     }
@@ -103,7 +106,18 @@ const UserDetailPage = () => {
       const {
         user: { uid, username },
       } = state;
-      console.log(data.password, uid, username);
+      const response = await api.put(`/users/${username}/password`, {
+        currentPassword: data.currentPassword,
+        newPassword: data.password,
+      });
+
+      if (response.status === 200) {
+        // Password updated successfully
+        toast.success("Password updated successfully");
+      } else {
+        // Password update failed
+        console.error("Password update failed");
+      }
       setValidated(false);
     } catch (error) {
       setData({
@@ -186,6 +200,19 @@ const UserDetailPage = () => {
                 onSubmit={handleUpdatePassword}
               >
                 <Form.Group>
+                  <Form.Label htmlFor="currentPassword">Current Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="currentPassword"
+                    required
+                    value={data.currentPassword}
+                    onChange={handleInputChange}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Current Password is required
+                  </Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group>
                   <Form.Label htmlFor="password">New Password</Form.Label>
                   <Form.Control
                     type="password"
@@ -201,7 +228,19 @@ const UserDetailPage = () => {
                     Must be 8-20 characters long.
                   </Form.Text>
                 </Form.Group>
-
+                <Form.Group>
+                  <Form.Label htmlFor="confirmPassword">Confirm New Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="confirmPassword"
+                    required
+                    value={data.confirmPassword}
+                    onChange={handleInputChange}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Passwords do not match
+                  </Form.Control.Feedback>
+                </Form.Group>
                 {data.errorMessage && (
                   <span className="form-error">{data.errorMessage}</span>
                 )}

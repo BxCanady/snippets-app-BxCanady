@@ -40,7 +40,7 @@ const RegisterPage = () => {
       [event.target.name]: event.target.value,
     });
   };
-
+  //..................................
   const handleAvatarSelect = (avatar) => {
     // Handle the avatar selection from AvatarPicker
     setData({

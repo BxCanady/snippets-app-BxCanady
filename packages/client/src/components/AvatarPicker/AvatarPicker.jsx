@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Figure, Row, Col, Form } from "react-bootstrap";
 import "./AvatarPicker.scss";
 
+
 const AvatarPicker = ({ avatars, selectedAvatar, onSelect, onUpload }) => {
     const [customImage, setCustomImage] = useState(null);
 
